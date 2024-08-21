@@ -14,19 +14,19 @@ namespace DataAccessLayer.Repositories
 		    _companyDbWrapper = companyDbWrapper;
         }
 
-        public IEnumerable<Company> GetAll()
+        public async IEnumerable<Company> GetAll()
         {
-            return _companyDbWrapper.FindAll();
+            return await _companyDbWrapper.FindAllAsync();
         }
 
-        public Company GetByCode(string companyCode)
+        public async Company GetByCode(string companyCode)
         {
-            return _companyDbWrapper.Find(t => t.CompanyCode.Equals(companyCode))?.FirstOrDefault();
+            return await _companyDbWrapper.FindAsync(t => t.CompanyCode.Equals(companyCode))?.FirstOrDefault();
         }
 
-        public bool SaveCompany(Company company)
+        public async bool SaveCompany(Company company)
         {
-            var itemRepo = _companyDbWrapper.Find(t =>
+            var itemRepo =await _companyDbWrapper.Find(t =>
                 t.SiteId.Equals(company.SiteId) && t.CompanyCode.Equals(company.CompanyCode))?.FirstOrDefault();
             if (itemRepo !=null)
             {
@@ -40,10 +40,21 @@ namespace DataAccessLayer.Repositories
                 itemRepo.PhoneNumber = company.PhoneNumber;
                 itemRepo.PostalZipCode = company.PostalZipCode;
                 itemRepo.LastModified = company.LastModified;
-                return _companyDbWrapper.Update(itemRepo);
+                return await _companyDbWrapper.Update(itemRepo);
             }
 
-            return _companyDbWrapper.Insert(company);
+            return await _companyDbWrapper.Insert(company);
+        }
+        public async bool DeleteCompany(Company company){
+            var itemRepo = await _companyDbWrapper.Find(t =>
+                t.SiteId.Equals(company.SiteId) && t.CompanyCode.Equals(company.CompanyCode))?.FirstOrDefault();
+            if (itemRepo !=null)
+            {
+                return await _companyDbWrapper.DeleteAsync(itemRepo);
+            }
+            return false;
         }
     }
+   
+
 }
